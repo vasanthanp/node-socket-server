@@ -1,6 +1,7 @@
 const express = require('express')
 const socket = require("socket.io")
 const app = express()
+const randomNumber = () => Math.floor(Math.random()*1000)
 
 app.use(require("cors"))
 const port = 4000
@@ -12,24 +13,14 @@ io.on("connection",socket => {
     socket.on("disconnect",()=>{
         console.log(socket.id +" is disconnected")
     })
-    socketGeneration(socket)
+    setInterval(()=>{
+        socket.emit("predict",{
+            'x':new Date(new Date().toJSON()),
+            'y':randomNumber()
+        })
+    },1000)
 })
-let data;
-const randomNumber = () => Math.floor(Math.random()*1000)
-const generateData = () => {
-    data = ["https://api.com"]
-    for(let i=0;i<4;i++) {
-        data.push(randomNumber())
-    }
-    return data;
-}   
-const sendPredictedData = (socket) => {
-    data = generateData()
-    socket.emit("predicted", data)
-}
-const socketGeneration = (socket) => {
-    setInterval(() => {sendPredictedData(socket)},1000)
-}
+
 server.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)
 })
